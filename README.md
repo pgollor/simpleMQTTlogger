@@ -1,6 +1,15 @@
 # simpleMQTTlogger
 simple python based mqtt logger client
 
+## requirements
+- python 3
+- paho mqtt for python 3
+
+### install mqtt
+```
+pip3 install paho-mqtt
+```
+
 ## help
 
 ```
