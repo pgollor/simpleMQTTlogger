@@ -5,12 +5,12 @@ simple python based mqtt logger client
 - python 3
 - paho mqtt for python 3
 
-### install mqtt
+### Install mqtt
 ```
 pip3 install paho-mqtt
 ```
 
-## help
+## Help
 
 ```
 $ ./simpleLogger.py -h
@@ -39,4 +39,10 @@ Options:
                         destination for mqtt message
     --newline=NEWLINE   newline character for logging file, default \n
     -v, --verbose       show debug messages
+```
+
+## Usage
+Log into ```mqtt.log```:
+```
+$ ./simpleLogger.py -f mqtt.log &
 ```
