@@ -10,6 +10,7 @@
 
 import optparse, signal, logging
 import paho.mqtt.client as mqtt
+import time
 
 
 DEFAULT_MQTT_SERVER = "127.0.0.1"
@@ -97,8 +98,14 @@ def main():
 	group = optparse.OptionGroup(parser, "Basic settings")
 	group.add_option("-f", "--filename",
 		dest = "filename",
-		help = "destination for mqtt message",
+		help = "destination file for mqtt message",
 		default = ""
+	)
+	group.add_option("--with-timestring",
+		dest = "timestring",
+		action = "store_true",
+		help = "add timestring as suffix for filename",
+		default = False
 	)
 	group.add_option("--newline",
 		dest = "newline",
@@ -136,9 +143,14 @@ def main():
 	userdata = dict()
 	userdata['logger'] = logger
 	if (options.filename != ""):
+		path = options.filename
+		if (options.timestring):
+			path = time.strftime("%Y-%m-%d_%H-%M_") + path
+		# end if
+
 		saveLogger = logging.getLogger('mqtt logger')
 		saveLogger.setLevel(logging.INFO)
-		ch = logging.FileHandler(options.filename, mode="w")
+		ch = logging.FileHandler(path, mode="w")
 		ch.setLevel(logging.INFO)
 		formatter = logging.Formatter('%(asctime)s' + options.newline + '%(message)s' + options.newline)
 		formatter.datefmt = '%Y-%m-%d %H:%M:%S'
