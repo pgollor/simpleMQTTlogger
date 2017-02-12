@@ -48,12 +48,20 @@ class GracefulKiller:
 
 
 def on_connect(client, userdata, flags, rc):
-	userdata['logger'].info("Connected with result code %i", rc)
+	userdata['logger'].info("Connected with result code: %i", rc)
+	
+	# subscribe to brocker with topic
+	client.subscribe(userdata["topic"], qos = 1)
 # end on_connect
 
 
 def on_disconnect(client, userdata, rc):
-	userdata['logger'].error("Disconnected with result code %i", rc)
+	msg = "Disconnected with result code: %i"
+	if (rc):
+		userdata['logger'].error(msg, rc)
+	else:
+		userdata['logger'].info(msg, rc)
+	# end if
 # end on_disconnect
 
 
@@ -62,7 +70,7 @@ def on_message(client, userdata, msg):
 		userdata['saveLogger'].info("%s%s%s", msg.topic, userdata['newline'], msg.payload.decode())
 	# end if
 	
-	userdata['logger'].info("%s\r\n%s", msg.topic, msg.payload.decode())
+	userdata['logger'].info("Topic: %s - Message: %s", msg.topic, msg.payload.decode())
 # end on_message
 
 
@@ -147,6 +155,10 @@ def main():
 	# parse options
 	(options, _) = parser.parse_args()
 	
+	# add infos to userdata
+	userdata = dict()
+	userdata["topic"] = options.topic
+	
 	
 	# init logging
 	loglevel = int(options.loglevel)
@@ -164,7 +176,6 @@ def main():
 	
 	
 	# createing save logger
-	userdata = dict()
 	userdata['logger'] = logger
 	if (options.filename != ""):
 		path = options.filename
@@ -219,8 +230,8 @@ def main():
 	logger.debug("connect to mqtt client")
 	client.connect(options.server, options.port, options.keepalive)
 	
-	# subscribe to brocker with topic
-	client.subscribe(options.topic, qos = 1)
+	# start client loop
+	client.loop_start()
 	
 	
 	# forever loop
@@ -229,7 +240,8 @@ def main():
 		
 		while (1):
 			#client.loop_forever()
-			client.loop(0.1)
+			#client.loop(0.1)
+			time.sleep(0.2)
 			
 			if (killer.kill_now):
 				raise KeyboardInterrupt
@@ -241,6 +253,7 @@ def main():
 	
 	# disconnecting
 	logger.debug("disconnecting from mqtt server")
+	client.loop_stop()
 	client.disconnect()
 # end main
 
