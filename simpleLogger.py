@@ -20,7 +20,7 @@ try:
 except Exception as e:
 	GIT_HASH = ""
 # end try
-__version__ = "0.1.0a-" + str(GIT_HASH)
+__version__ = "0.1.0b-" + str(GIT_HASH)
 
 
 DEFAULT_MQTT_SERVER = "127.0.0.1"

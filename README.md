@@ -19,6 +19,7 @@ Usage: simpleLogger.py [options]
 simple logger - A simple MQTT logger to show or save mqtt data.
 
 Options:
+  --version             show program's version number and exit
   -h, --help            show this help message and exit
 
   MQTT settings:
@@ -36,9 +37,13 @@ Options:
 
   Basic settings:
     -f FILENAME, --filename=FILENAME
-                        destination for mqtt message
+                        destination file for mqtt message
+    -l LOGLEVEL, --loglevel=LOGLEVEL
+                        50: critical  40: error  30: warning  20:info
+                        10:debug
+    --with-timestring   add timestring as suffix for filename
     --newline=NEWLINE   newline character for logging file, default \n
-    -v, --verbose       show debug messages
+    -v, --verbose       show debug messages (overrites loglevel to debug)
 ```
 
 ## Usage
