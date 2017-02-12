@@ -29,7 +29,7 @@ class GracefulKiller:
 		signal.signal(signal.SIGTERM, self.exit_gracefully)
 	# end __init__
 
-	def exit_gracefully(self,signum, frame):
+	def exit_gracefully(self, signum, frame):
 		self.kill_now = True
 	# end exit_gracefully
 	
@@ -37,11 +37,15 @@ class GracefulKiller:
 
 
 
-#def on_connect(client, userdata, flags, rc):
-#	logging.debug("Connected with result code %i", rc)
-#
-#	client.subscribe("#")
+def on_connect(client, userdata, flags, rc):
+	userdata['logger'].info("Connected with result code %i", rc)
 # end on_connect
+
+
+def on_disconnect(client, userdata, rc):
+	userdata['logger'].error("Disconnected with result code %i", rc)
+# end on_disconnect
+
 
 def on_message(client, userdata, msg):
 	if ('saveLogger' in userdata):
@@ -167,9 +171,14 @@ def main():
 	
 	# add mqtt client
 	client = mqtt.Client()
-	#client.on_connect = on_connect
-	client.on_message = on_message
+	
+	# set user data for callbacks
 	client.user_data_set(userdata)
+	
+	# register callbacks
+	client.on_connect = on_connect
+	client.on_disconnect = on_disconnect
+	client.on_message = on_message
 	
 	# check username and password
 	if (len(options.username) > 0):
@@ -189,9 +198,12 @@ def main():
 	# connect to mqttclient
 	logger.debug("connect to mqtt client")
 	client.connect(options.server, options.port, options.keepalive)
-	client.subscribe(options.topic, qos=1)
 	
-	# loop forever
+	# subscribe to brocker with topic
+	client.subscribe(options.topic, qos = 1)
+	
+	
+	# forever loop
 	try:
 		logger.debug("start mqtt loop")
 		
