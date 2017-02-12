@@ -13,6 +13,16 @@ import paho.mqtt.client as mqtt
 import time
 
 
+# et git hash, but works only if git or git.exe is in user path
+try:
+	import subprocess
+	GIT_HASH = subprocess.check_output(['git', 'rev-parse', '--short', 'HEAD'], stderr=subprocess.STDOUT).decode()
+except Exception as e:
+	GIT_HASH = ""
+# end try
+__version__ = "0.1.0a-" + str(GIT_HASH)
+
+
 DEFAULT_MQTT_SERVER = "127.0.0.1"
 DEFAULT_MQTT_PORT = 1883
 DEFAULT_TOPIC = "#"
@@ -57,9 +67,12 @@ def on_message(client, userdata, msg):
 
 
 def main():
+	global __version__, GIT_HASH	
+	
 	parser = optparse.OptionParser(
 		usage = "%prog [options]",
-		description = "simple logger - A simple MQTT logger to show or save mqtt data."
+		description = "simple logger - A simple MQTT logger to show or save mqtt data.",
+		version="%prog " + str(__version__)
 	)
 	
 	group = optparse.OptionGroup(parser, "MQTT settings")
@@ -105,6 +118,11 @@ def main():
 		help = "destination file for mqtt message",
 		default = ""
 	)
+	group.add_option("-l", "--loglevel",
+		dest = "loglevel",
+		help = str(logging.CRITICAL) + ": critical  " + str(logging.ERROR) + ": error  " + str(logging.WARNING) + ": warning  " + str(logging.INFO) + ":info  " + str(logging.DEBUG) + ":debug",
+		default = logging.ERROR
+	)
 	group.add_option("--with-timestring",
 		dest = "timestring",
 		action = "store_true",
@@ -119,7 +137,7 @@ def main():
 	group.add_option("-v", "--verbose",
 		dest = "verbose",
 		action = "store_true",
-		help = "show debug messages",
+		help = "show debug messages (overrites loglevel to debug)",
 		default = False
 	)
 	parser.add_option_group(group)
@@ -129,7 +147,7 @@ def main():
 	
 	
 	# init logging
-	loglevel = logging.WARN
+	loglevel = options["loglevel"]
 	if (options.verbose):
 		loglevel = logging.DEBUG
 	# end if
