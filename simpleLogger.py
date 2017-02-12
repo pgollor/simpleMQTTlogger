@@ -120,6 +120,8 @@ def main():
 	)
 	group.add_option("-l", "--loglevel",
 		dest = "loglevel",
+		action = "store",
+		type = 'int',
 		help = str(logging.CRITICAL) + ": critical  " + str(logging.ERROR) + ": error  " + str(logging.WARNING) + ": warning  " + str(logging.INFO) + ":info  " + str(logging.DEBUG) + ":debug",
 		default = logging.ERROR
 	)
@@ -147,7 +149,7 @@ def main():
 	
 	
 	# init logging
-	loglevel = options["loglevel"]
+	loglevel = int(options.loglevel)
 	if (options.verbose):
 		loglevel = logging.DEBUG
 	# end if
